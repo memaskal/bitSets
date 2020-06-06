@@ -4,6 +4,8 @@ from array import array
 
 
 class TagsManager:
+    TAG_KEYS = {'tag' + str(i) for i in range(1, 11)}
+
     def __init__(self, tags: Dict[str, BitMap]):
         self.tags = tags
 

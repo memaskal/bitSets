@@ -5,20 +5,18 @@ from src.TagsManager import TagsManager
 
 
 class TestTagsManager(unittest.TestCase):
-
-    TAG_KEYS = ['tag' + str(i) for i in range(1, 11)]
-
-    def create_empty_tag_list(self):
+    @staticmethod
+    def create_empty_tag_list():
         """
         Creates an empty tag list, for tag1, tag2, ...tag10
         """
         tags = {}
-        for tag in self.TAG_KEYS:
+        for tag in TagsManager.TAG_KEYS:
             tags[tag] = BitMap()
         return tags
 
     def setUp(self) -> None:
-        self.tags = self.create_empty_tag_list()
+        self.tags = TestTagsManager.create_empty_tag_list()
         self.tagsm = TagsManager(self.tags)
 
     def test_countUsers_havingBothTags_returnsPositiveNumber(self):

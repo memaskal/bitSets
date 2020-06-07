@@ -63,6 +63,21 @@ class TagsHandler(BaseHandler):
             self.tagsm.add_tags(self.current_user["id"], tags)
 
 
+class StatsHandler(RequestHandler):
+    def initialize(self, db, sesm: SessionManager, tagsm: TagsManager) -> None:
+        self.db = db
+        self.sesm = sesm
+        self.tagsm = tagsm
+
+    def get(self):
+        total_users = len(self.db["users"])
+        self.write({
+            "offline_for_a_week": self.sesm.get_inactive_users_count_for_a_week(total_users),
+            "users_with_tag1_and_tags2": self.tagsm.count_users_with_tags("tag1", "tag2"),
+            "user_ids_with_tag1": list(self.tagsm.get_users_with_tag("tag1"))
+        })
+
+
 def create_users():
     users = {}
     for user_id in range(1000):
@@ -71,7 +86,7 @@ def create_users():
             "id": user_id,
             "token": token,
             "name": "user_" + str(user_id),
-            "tags": list(["tag1"])
+            "tags": list()
         }
     return users
 
@@ -88,11 +103,12 @@ def create_user_history():
 
 def make_app():
     db = {"users": create_users()}
-    tags = create_tags()
-    history = create_user_history()
+    sesm = SessionManager(create_user_history())
+    tagsm = TagsManager(create_tags())
     urls = [
-        url(r"/login", LoginHandler, dict(db=db, sesm=SessionManager(history)), name="login"),
-        url(r"/api/users/([0-9]+)/tags", TagsHandler, dict(db=db, tagsm=TagsManager(tags)), name="tags")
+        url("/login", LoginHandler, dict(db=db, sesm=sesm), name="login"),
+        url(r"/api/users/([0-9]+)/tags", TagsHandler, dict(db=db, tagsm=tagsm), name="tags"),
+        url("/stats", StatsHandler, dict(db=db, sesm=sesm, tagsm=tagsm), name="stats")
     ]
     return Application(urls, debug=True)
 

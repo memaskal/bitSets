@@ -21,10 +21,12 @@ class SessionManager:
         date = get_date_str()
         self.get_days_activity(date).add(user_id)
 
-    def active_users_count(self, activity: BitMap) -> int:
+    @staticmethod
+    def active_users_count(activity: BitMap) -> int:
         return len(activity)
 
-    def agg_activities(self, activities: List[BitMap]) -> BitMap:
+    @staticmethod
+    def agg_activities(activities: List[BitMap]) -> BitMap:
         return BitMap.union(*activities)
 
     def get_inactive_users_count_for_a_week(self, total_users) -> int:
